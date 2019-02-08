@@ -1,0 +1,33 @@
+{
+  "Swords": [
+    {
+      "Name": "Bronze Sword",
+      "Attack": 3,
+      "Defense": 2,
+      "Buy Price": 10,
+      "Sell Price": 5
+    },
+    {
+      "Name": "Iron Sword",
+      "Attack": 5,
+      "Defense": 4,
+      "Buy Price": 30,
+      "Sell Price": 15
+    },
+    {
+      "Name": "Silver Sword",
+      "Attack": 7,
+      "Defense": 6,
+      "Buy Price": 50,
+      "Sell Price": 25
+    }
+  ],
+  "exclude": [
+    "**/bin",
+    "**/bower_components",
+    "**/jspm_packages",
+    "**/node_modules",
+    "**/obj",
+    "**/platforms"
+  ]
+}

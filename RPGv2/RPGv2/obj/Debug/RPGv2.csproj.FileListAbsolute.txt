@@ -1,0 +1,11 @@
+C:\Users\reedchr001\source\repos\RPGv2\RPGv2\bin\Debug\RPGv2.exe.config
+C:\Users\reedchr001\source\repos\RPGv2\RPGv2\bin\Debug\RPGv2.exe
+C:\Users\reedchr001\source\repos\RPGv2\RPGv2\bin\Debug\RPGv2.pdb
+C:\Users\reedchr001\source\repos\RPGv2\RPGv2\bin\Debug\Newtonsoft.Json.dll
+C:\Users\reedchr001\source\repos\RPGv2\RPGv2\bin\Debug\Newtonsoft.Json.pdb
+C:\Users\reedchr001\source\repos\RPGv2\RPGv2\bin\Debug\Newtonsoft.Json.xml
+C:\Users\reedchr001\source\repos\RPGv2\RPGv2\obj\Debug\RPGv2.csprojAssemblyReference.cache
+C:\Users\reedchr001\source\repos\RPGv2\RPGv2\obj\Debug\RPGv2.csproj.CoreCompileInputs.cache
+C:\Users\reedchr001\source\repos\RPGv2\RPGv2\obj\Debug\RPGv2.csproj.CopyComplete
+C:\Users\reedchr001\source\repos\RPGv2\RPGv2\obj\Debug\RPGv2.exe
+C:\Users\reedchr001\source\repos\RPGv2\RPGv2\obj\Debug\RPGv2.pdb
