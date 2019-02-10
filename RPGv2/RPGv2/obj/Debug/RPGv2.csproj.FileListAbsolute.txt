@@ -20,3 +20,14 @@ E:\CSharp\Gleemanjeff-master\RPGv2\RPGv2\obj\Debug\RPGv2.csproj.CoreCompileInput
 E:\CSharp\Gleemanjeff-master\RPGv2\RPGv2\obj\Debug\RPGv2.csproj.CopyComplete
 E:\CSharp\Gleemanjeff-master\RPGv2\RPGv2\obj\Debug\RPGv2.exe
 E:\CSharp\Gleemanjeff-master\RPGv2\RPGv2\obj\Debug\RPGv2.pdb
+C:\Users\chris\Documents\GitHub\Gleemanjeff\RPGv2\RPGv2\bin\Debug\RPGv2.exe.config
+C:\Users\chris\Documents\GitHub\Gleemanjeff\RPGv2\RPGv2\bin\Debug\RPGv2.exe
+C:\Users\chris\Documents\GitHub\Gleemanjeff\RPGv2\RPGv2\bin\Debug\RPGv2.pdb
+C:\Users\chris\Documents\GitHub\Gleemanjeff\RPGv2\RPGv2\bin\Debug\Newtonsoft.Json.dll
+C:\Users\chris\Documents\GitHub\Gleemanjeff\RPGv2\RPGv2\bin\Debug\Newtonsoft.Json.pdb
+C:\Users\chris\Documents\GitHub\Gleemanjeff\RPGv2\RPGv2\bin\Debug\Newtonsoft.Json.xml
+C:\Users\chris\Documents\GitHub\Gleemanjeff\RPGv2\RPGv2\obj\Debug\RPGv2.csprojAssemblyReference.cache
+C:\Users\chris\Documents\GitHub\Gleemanjeff\RPGv2\RPGv2\obj\Debug\RPGv2.csproj.CoreCompileInputs.cache
+C:\Users\chris\Documents\GitHub\Gleemanjeff\RPGv2\RPGv2\obj\Debug\RPGv2.csproj.CopyComplete
+C:\Users\chris\Documents\GitHub\Gleemanjeff\RPGv2\RPGv2\obj\Debug\RPGv2.exe
+C:\Users\chris\Documents\GitHub\Gleemanjeff\RPGv2\RPGv2\obj\Debug\RPGv2.pdb

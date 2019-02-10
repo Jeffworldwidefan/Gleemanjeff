@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RPGv2
 {
-    class Game
+    internal class Game
     {
         public static void StartGame()
         {
-
+            Console.Write("Enter years of history: ");
+            StartHistory(int.Parse(Console.ReadLine()));
         }
         public static void StartHistory(int years)
         {
-            
+            List<Race> races = new List<Race>();
+            for (int i = 0; i < Race.RacesAmount(); i++)
+            {
+                races.Add(new Race(i));
+            }
         }
     }
 }

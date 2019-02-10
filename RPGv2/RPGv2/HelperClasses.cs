@@ -24,22 +24,18 @@ namespace RPGv2
                         Console.WriteLine("A state error has occured. State: {0}", sm.GetState());
                         break;
                 }
-                Console.ReadKey();
             }
         }
         public static bool Start(bool done)
         {
             Console.Clear();
-            int inp = MultipleChoice(false, "Start", "Options", "Modify JSON files", "Exit");
+            int inp = MultipleChoice(false, "Start", "Modify JSON files", "Exit");
             switch (inp)
             {
                 case 0:
                     Game.StartGame();
                     return false;
                 case 1:
-
-                    return false;
-                case 2:
                     string[] jsonFiles = Directory.GetFiles("Dependencies");
                     for (int i = 0; i < jsonFiles.Length; i++)
                         jsonFiles[i] = jsonFiles[i].Remove(0, 13);
@@ -99,8 +95,7 @@ namespace RPGv2
                             break;
                     }
                     return false;
-                case 3:
-
+                case 2:
                     return true;
                 default:
                     break;
@@ -225,6 +220,8 @@ namespace RPGv2
                 }
             }
         }
+
+        public static int RacesAmount() => JArray.Parse(File.ReadAllText(@"Dependencies\race.json")).Count;
     }
 
     internal class Player
