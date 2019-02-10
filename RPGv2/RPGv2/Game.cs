@@ -13,9 +13,10 @@ namespace RPGv2
         public static void StartHistory(int years)
         {
             List<Race> races = new List<Race>();
+            List<Faction> factions = new List<Faction>();
             for (int i = 0; i < Race.RacesAmount(); i++)
             {
-                races.Add(new Race(i));
+                races.Add(new Race(i, new Random().Next(20)));
             }
         }
     }

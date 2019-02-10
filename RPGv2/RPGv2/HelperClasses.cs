@@ -197,8 +197,10 @@ namespace RPGv2
         int intelligence;
         int baseAtt;
         int baseDef;
-        public Race(int index)
+        int pop;
+        public Race(int index, int p)
         {
+            pop = p;
             JArray array = JArray.Parse(File.ReadAllText(@"Dependencies\race.json"));
             JObject obj = JObject.Parse(array[index].ToString());
             name = (string)obj["Name"];
@@ -206,8 +208,9 @@ namespace RPGv2
             baseAtt = (int)obj["BaseAttack"];
             baseDef = (int)obj["BaseDefense"];
         }
-        public Race(string n)
+        public Race(string n, int p)
         {
+            pop = p;
             JArray array = JArray.Parse(File.ReadAllText(@"Dependencies\race.json"));
             foreach (JObject obj in array)
             {
@@ -224,10 +227,27 @@ namespace RPGv2
         public static int RacesAmount() => JArray.Parse(File.ReadAllText(@"Dependencies\race.json")).Count;
     }
 
+    class Faction
+    {
+        string name;
+        Race race;
+        List<string> otherFactions = new List<string>();
+        List<string> advances = new List<string>();
+        List<int> favor = new List<int>();
+
+        public Faction(string n, Race r)
+        {
+            name = n;
+            race = r;
+        }
+    }
+
     internal class Player
     {
         private string name;
         private string cla;
+        private string race;
+        private string faction;
         private int att;
         private int matk;
         private int def;
