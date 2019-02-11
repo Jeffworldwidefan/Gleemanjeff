@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json.Linq;
@@ -103,7 +103,7 @@ namespace RPGv2
             return false;
 
         }
-        
+
         public static int MultipleChoice(bool canCancel, params string[] options)
         {
             const int startX = 0;
@@ -198,12 +198,15 @@ namespace RPGv2
         int baseAtt;
         int baseDef;
         int pop;
+
+        public string Name { get => name; set => name = value; }
+
         public Race(int index, int p)
         {
             pop = p;
             JArray array = JArray.Parse(File.ReadAllText(@"Dependencies\race.json"));
             JObject obj = JObject.Parse(array[index].ToString());
-            name = (string)obj["Name"];
+            Name = (string)obj["Name"];
             intelligence = (int)obj["Intelligence"];
             baseAtt = (int)obj["BaseAttack"];
             baseDef = (int)obj["BaseDefense"];
@@ -216,14 +219,14 @@ namespace RPGv2
             {
                 if (obj["Name"].ToString() == n)
                 {
-                    name = (string)obj["Name"];
+                    Name = (string)obj["Name"];
                     intelligence = (int)obj["Intelligence"];
                     baseAtt = (int)obj["BaseAttack"];
                     baseDef = (int)obj["BaseDefense"];
                 }
             }
         }
-        public int[] GetVals() => new int[] { name, intelligence, baseAtt, baseDef, pop };
+        public int[] GetVals() => new int[] { intelligence, baseAtt, baseDef, pop };
         public static int RacesAmount() => JArray.Parse(File.ReadAllText(@"Dependencies\race.json")).Count;
     }
 
@@ -237,21 +240,37 @@ namespace RPGv2
         List<int> favor = new List<int>();
 
         public int Pop { get => pop; set => pop = value; }
+        internal Race Race { get => race; set => race = value; }
+        public string Name { get => name; set => name = value; }
 
         public Faction(Race r, string n)
         {
-            name = n;
-            race = r;
+            Name = n;
+            Race = r;
         }
 
         public Faction(Race r)
         {
             string[] factionNames = File.ReadAllLines(@"Dependencies\FactionNames.txt");
-            name = factionNames[new Random().Next(factionNames.Length)];
-            race = r;
+            Name = factionNames[new Random().Next(factionNames.Length)];
+            Race = r;
         }
 
-        public void AddPop(int add) { Pop+=add }
+        public void AddPop(int add) { Pop += add; }
+
+        public override string ToString()
+        {
+            return String.Format("Name: {0}\nPop: {1}", Name, pop);
+        }
+    }
+
+    class History
+    {
+        List<Race> races = new List<Race>();
+        List<Faction> factions = new List<Faction>();
+
+        internal List<Race> Races { get => races; set => races = value; }
+        internal List<Faction> Factions { get => factions; set => factions = value; }
     }
 
     internal class Player
@@ -277,17 +296,23 @@ namespace RPGv2
                 CreateCharacter(slot, saves);
             }
         }
+
+        public string Name { get => name; set => name = value; }
+        public string Cla { get => cla; set => cla = value; }
+        public string Race { get => race; set => race = value; }
+        public string Faction { get => faction; set => faction = value; }
+
         public void CreateCharacter(int slot, JArray arr)
         {
             JObject save = JObject.Parse(arr[slot - 1].ToString());
             Console.Write("Enter Name: ");
-            name = Console.ReadLine();
-            save["Name"] = name;
+            Name = Console.ReadLine();
+            save["Name"] = Name;
             int inp = HelperClasses.MultipleChoice(false, "Mage", "Warrior", "Rogue");
             switch (inp)
             {
                 case 1:
-                    cla = "Mage";
+                    Cla = "Mage";
                     att = 2;
                     matk = 7;
                     def = 1;
@@ -298,7 +323,7 @@ namespace RPGv2
                     eva = 3;
                     break;
                 case 2:
-                    cla = "Warrior";
+                    Cla = "Warrior";
                     att = 9;
                     matk = 2;
                     def = 5;
@@ -309,7 +334,7 @@ namespace RPGv2
                     eva = 2;
                     break;
                 case 3:
-                    cla = "Rogue";
+                    Cla = "Rogue";
                     att = 6;
                     matk = 4;
                     def = 2;
@@ -322,7 +347,7 @@ namespace RPGv2
                 default:
                     break;
             }
-            save["Class"] = cla;
+            save["Class"] = Cla;
             save["Attack"] = att;
             save["Defense"] = def;
             save["Magic Attack"] = matk;
