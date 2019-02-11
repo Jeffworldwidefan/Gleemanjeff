@@ -15,12 +15,13 @@ namespace RPGv2
         }
         public static History StartHistory(int years)
         {
+
             History h = new History();
             List<Race> races = new List<Race>();
             List<Faction> factions = new List<Faction>();
             for (int i = 0; i < Race.RacesAmount(); i++)
             {
-                races.Add(new Race(i, new Random().Next(2000000)));
+                races.Add(new Race(i, new Random().Next(20000)));
             }
             Random rand = new Random();
             for (int i = 0; i < races.Count; i++)
@@ -34,7 +35,6 @@ namespace RPGv2
                     int num = rand.Next(100);
                     if (num < 70)
                     {
-                        //Console.WriteLine("Adding {0} to faction: Main City", race.Name);
                         factions[mainCityInd].Pop++;
                         num = 101;
                     }
@@ -48,7 +48,6 @@ namespace RPGv2
                             Faction f = factions[num2];
                             if (f.Race == race)
                             {
-                                //   Console.WriteLine("Adding {0} to faction: {1}", race.Name, f.Name);
                                 done = true;
                                 factions[num2].Pop++;
                             }
@@ -57,6 +56,7 @@ namespace RPGv2
                     }
                     if (num < 100)
                     {
+                        Console.WriteLine(race.Name);
                         bool exists = false;
                         Faction f = new Faction(race);
                         for (int k = 0; k < factions.Count; k++)
@@ -71,17 +71,15 @@ namespace RPGv2
                         {
                             factions.Add(new Faction(race));
                             factions[factions.Count - 1].Pop++;
-                            // Console.WriteLine("Faction created: {0}", factions[factions.Count - 1].Name);
                         }
                     }
                 }
             }
-            /*
             for(int i = 0; i<=years; i++)
             {
-
+                Event e = new Event();
+                Console.ReadKey();
             }
-            */
             h.Races = races;
             h.Factions = factions;
             return h;

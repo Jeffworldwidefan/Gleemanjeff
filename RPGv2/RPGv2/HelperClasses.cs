@@ -230,14 +230,56 @@ namespace RPGv2
         public static int RacesAmount() => JArray.Parse(File.ReadAllText(@"Dependencies\race.json")).Count;
     }
 
+    class Event
+    {
+        string eventName;
+        string eventDesc;
+        int chance;
+
+        public Event()
+        {
+            JArray events = JArray.Parse(File.ReadAllText(@"Dependencies\player.json"));
+            int num = new Random().Next(1,1000);
+            List<int> minMax = new List<int>();
+            minMax.Add(1);
+            for(int i = 1, j = 0; i<=events.Count; i++)
+            {
+                if (i % 2 != 1)
+                {
+                    minMax.Add((int)events[j]["Count"]);
+                    Console.WriteLine(minMax[i]);
+                    j++;
+                }
+                else
+                    minMax.Add(minMax[i - 1] + 1);
+            }
+            foreach (int i in minMax)
+                Console.WriteLine(i);
+        }
+    }
+
+    class HistoricalEvent
+    {
+        string name;
+        int year;
+
+        public HistoricalEvent(string n, int y)
+        {
+            Name = n;
+            Year = y;
+        }
+
+        public string Name { get => name; set => name = value; }
+        public int Year { get => year; set => year = value; }
+    }
+
     class Faction
     {
         string name;
         Race race;
         int pop = 0;
-        List<string> otherFactions = new List<string>();
         List<string> advances = new List<string>();
-        List<int> favor = new List<int>();
+        List<HistoricalEvent> historicalEvents = new List<HistoricalEvent>();
 
         public int Pop { get => pop; set => pop = value; }
         internal Race Race { get => race; set => race = value; }
