@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace RPGv2
@@ -8,46 +8,83 @@ namespace RPGv2
         public static void StartGame()
         {
             Console.Write("Enter years of history: ");
-            StartHistory(int.Parse(Console.ReadLine()));
+            History h = StartHistory(int.Parse(Console.ReadLine()));
+            foreach (Faction f in h.Factions)
+                Console.WriteLine(f.ToString());
+            Console.ReadKey();
         }
-        public static void StartHistory(int years)
+        public static History StartHistory(int years)
         {
+            History h = new History();
             List<Race> races = new List<Race>();
             List<Faction> factions = new List<Faction>();
             for (int i = 0; i < Race.RacesAmount(); i++)
             {
-                races.Add(new Race(i, new Random().Next(2000)));
+                races.Add(new Race(i, new Random().Next(2000000)));
             }
             Random rand = new Random();
             for (int i = 0; i < races.Count; i++)
             {
                 Race race = races[i];
                 int[] vals = race.GetVals();
-                factions.Add(new Faction(races[i], "Main City: " + vals[0]));
+                factions.Add(new Faction(races[i], "Main City: " + race.Name));
                 int mainCityInd = factions.Count - 1;
-                for(int j = 0; j<=vals[4]; j++)
+                for (int j = 0; j <= vals[3]; j++)
                 {
                     int num = rand.Next(100);
                     if (num < 70)
                     {
+                        //Console.WriteLine("Adding {0} to faction: Main City", race.Name);
                         factions[mainCityInd].Pop++;
                         num = 101;
                     }
-                    if(num < 95)
+                    if (num < 95)
                     {
                         bool done = false;
                         Random rand2 = new Random();
-                        while(!done)
+                        while (!done)
                         {
-                            
+                            int num2 = rand2.Next(factions.Count);
+                            Faction f = factions[num2];
+                            if (f.Race == race)
+                            {
+                                //   Console.WriteLine("Adding {0} to faction: {1}", race.Name, f.Name);
+                                done = true;
+                                factions[num2].Pop++;
+                            }
+                        }
+                        num = 101;
+                    }
+                    if (num < 100)
+                    {
+                        bool exists = false;
+                        Faction f = new Faction(race);
+                        for (int k = 0; k < factions.Count; k++)
+                        {
+                            if (factions[k].Name == f.Name)
+                            {
+                                exists = true;
+                                factions[k].Pop++;
+                            }
+                        }
+                        if (!exists)
+                        {
+                            factions.Add(new Faction(race));
+                            factions[factions.Count - 1].Pop++;
+                            // Console.WriteLine("Faction created: {0}", factions[factions.Count - 1].Name);
                         }
                     }
-
-                    factions.Add(new Faction(race));
-
-                    factions[factions.Count - 1].Pop++;
                 }
             }
+            /*
+            for(int i = 0; i<=years; i++)
+            {
+
+            }
+            */
+            h.Races = races;
+            h.Factions = factions;
+            return h;
         }
     }
 }
