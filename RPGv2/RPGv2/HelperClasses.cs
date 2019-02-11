@@ -223,7 +223,7 @@ namespace RPGv2
                 }
             }
         }
-
+        public int[] GetVals() => new int[] { name, intelligence, baseAtt, baseDef, pop };
         public static int RacesAmount() => JArray.Parse(File.ReadAllText(@"Dependencies\race.json")).Count;
     }
 
@@ -231,15 +231,27 @@ namespace RPGv2
     {
         string name;
         Race race;
+        int pop = 0;
         List<string> otherFactions = new List<string>();
         List<string> advances = new List<string>();
         List<int> favor = new List<int>();
 
-        public Faction(string n, Race r)
+        public int Pop { get => pop; set => pop = value; }
+
+        public Faction(Race r, string n)
         {
             name = n;
             race = r;
         }
+
+        public Faction(Race r)
+        {
+            string[] factionNames = File.ReadAllLines(@"Dependencies\FactionNames.txt");
+            name = factionNames[new Random().Next(factionNames.Length)];
+            race = r;
+        }
+
+        public void AddPop(int add) { Pop+=add }
     }
 
     internal class Player
