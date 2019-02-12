@@ -21,7 +21,7 @@ namespace RPGv2
             List<Faction> factions = new List<Faction>();
             for (int i = 0; i < Race.RacesAmount(); i++)
             {
-                races.Add(new Race(i, new Random().Next(20000)));
+                races.Add(new Race(i, new Random().Next(2000000)));
             }
             Random rand = new Random();
             for (int i = 0; i < races.Count; i++)
@@ -77,33 +77,31 @@ namespace RPGv2
             int totalPeople = 0;
             foreach (Faction f in factions)
                 totalPeople += f.Pop;
-            for (int i = 0; i<=years; i++)
+            for (int i = 0; i <= years; i++)
             {
-                for(int j = 0; j < factions.Count; j++)
+                for (int j = 0; j < factions.Count; j++)
                 {
-                    Faction f = factions[j];
-                    Event e = new Event();
                     int chainAmount = 0;
                     do
                     {
+                        Faction f = factions[j];
+                        Event e = new Event();
                         switch (e.Name)
                         {
+                            #region none
                             case "None":
                                 break;
+                            #endregion
+                            #region chain event
                             case "Chain Event":
                                 chainAmount += 3;
                                 break;
+                            #endregion
+                            #region famine
                             case "Famine":
                                 int deathChance = new Random().Next(100);
                                 Random rando = new Random();
-                                for(int k = 0; k<=f.Pop; k++)
-                                {
-                                    int numChance = rando.Next(100);
-                                    if(numChance < deathChance)
-                                    {
-                                        f.Pop--;
-                                    }
-                                }
+                                f.Pop -= Convert.ToInt32(f.Pop * (deathChance/100.0));
                                 if (deathChance < 10)
                                 {
                                     f.HistoricalEvents.Add(new HistoricalEvent("slight famine", i));
@@ -125,11 +123,40 @@ namespace RPGv2
                                     break;
                                 }
                                 break;
+                            #endregion
+                            #region popup
+                            case "Population Up":
+                                int percentUp = new Random().Next(1, 20);
+                                f.Pop += Convert.ToInt32(f.Pop * (percentUp / 100.0));
+                                break;
+                            #endregion
+                            #region popdown
+                            case "Population Down":
+                                int percentDown = new Random().Next(1, 20);
+                                f.Pop += Convert.ToInt32(f.Pop * (percentDown / 100.0));
+                                break;
+                            #endregion
+                            case "War Declaration":
+                                bool doneFinding = false;
+                                Faction opp = new Faction(new Race(0, 0));
+                                while (!doneFinding)
+                                {
+                                    int num = rand.Next(factions.Count);
+                                    opp = factions[num];
+                                    if (opp.Race != f.Race)
+                                        doneFinding = true;
+                                }
+                                f.War.Add(opp);
+                                break;
+                            case "Discovery":
+                                break;
+                            #region default
                             default:
                                 Console.Clear();
                                 Console.WriteLine("An unknown event has occured, name: {0}", e.Name);
                                 Console.ReadKey();
                                 break;
+                                #endregion
                         }
                         chainAmount--;
                     } while (chainAmount > 0);
