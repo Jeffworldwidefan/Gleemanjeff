@@ -2,12 +2,12 @@
   {
     "Name": "None",
     "Desc": "Nothing happens.",
-    "Chance": 760
+    "Chance": 775
   },
   {
     "Name": "Chain Event",
     "Desc": "More than one event takes place",
-    "Chance": 25
+    "Chance": 10
   },
   {
     "Name": "Population Up",

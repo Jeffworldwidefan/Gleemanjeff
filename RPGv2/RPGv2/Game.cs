@@ -56,7 +56,6 @@ namespace RPGv2
                     }
                     if (num < 100)
                     {
-                        Console.WriteLine(race.Name);
                         bool exists = false;
                         Faction f = new Faction(race);
                         for (int k = 0; k < factions.Count; k++)
@@ -75,10 +74,66 @@ namespace RPGv2
                     }
                 }
             }
-            for(int i = 0; i<=years; i++)
+            int totalPeople = 0;
+            foreach (Faction f in factions)
+                totalPeople += f.Pop;
+            for (int i = 0; i<=years; i++)
             {
-                Event e = new Event();
-                Console.ReadKey();
+                for(int j = 0; j < factions.Count; j++)
+                {
+                    Faction f = factions[j];
+                    Event e = new Event();
+                    int chainAmount = 0;
+                    do
+                    {
+                        switch (e.Name)
+                        {
+                            case "None":
+                                break;
+                            case "Chain Event":
+                                chainAmount += 3;
+                                break;
+                            case "Famine":
+                                int deathChance = new Random().Next(100);
+                                Random rando = new Random();
+                                for(int k = 0; k<=f.Pop; k++)
+                                {
+                                    int numChance = rando.Next(100);
+                                    if(numChance < deathChance)
+                                    {
+                                        f.Pop--;
+                                    }
+                                }
+                                if (deathChance < 10)
+                                {
+                                    f.HistoricalEvents.Add(new HistoricalEvent("slight famine", i));
+                                    break;
+                                }
+                                if (deathChance < 30)
+                                {
+                                    f.HistoricalEvents.Add(new HistoricalEvent("mild famine", i));
+                                    break;
+                                }
+                                if (deathChance < 70)
+                                {
+                                    f.HistoricalEvents.Add(new HistoricalEvent("severe famine", i));
+                                    break;
+                                }
+                                if (deathChance < 100)
+                                {
+                                    f.HistoricalEvents.Add(new HistoricalEvent("extreme famine", i));
+                                    break;
+                                }
+                                break;
+                            default:
+                                Console.Clear();
+                                Console.WriteLine("An unknown event has occured, name: {0}", e.Name);
+                                Console.ReadKey();
+                                break;
+                        }
+                        chainAmount--;
+                    } while (chainAmount > 0);
+                }
             }
             h.Races = races;
             h.Factions = factions;

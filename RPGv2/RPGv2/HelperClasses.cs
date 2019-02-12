@@ -232,30 +232,42 @@ namespace RPGv2
 
     class Event
     {
-        string eventName;
-        string eventDesc;
-        int chance;
+        string name;
+        string desc;
 
         public Event()
         {
-            JArray events = JArray.Parse(File.ReadAllText(@"Dependencies\player.json"));
-            int num = new Random().Next(1,1000);
+            JArray events = JArray.Parse(File.ReadAllText(@"Dependencies\events.json"));
+            int chanceTotal = 0;
+            foreach (JObject o in events)
+                chanceTotal += (int)o["Chance"];
+            int num = new Random().Next(chanceTotal + 1);
             List<int> minMax = new List<int>();
-            minMax.Add(1);
-            for(int i = 1, j = 0; i<=events.Count; i++)
+            minMax.Add(0);
+            for (int i = 1, j = 0; j < events.Count; i++)
             {
-                if (i % 2 != 1)
+                if (i % 2 == 1 )
                 {
-                    minMax.Add((int)events[j]["Count"]);
-                    Console.WriteLine(minMax[i]);
+                    minMax.Add((int)events[j]["Chance"] + minMax[i - 1]);
                     j++;
                 }
                 else
-                    minMax.Add(minMax[i - 1] + 1);
+                    minMax.Add(minMax[i - 1]);
             }
-            foreach (int i in minMax)
-                Console.WriteLine(i);
+
+            for(int i = 0; i<minMax.Count - 1;i++)
+            {
+                if(num >= minMax[i] && num <= minMax[i+1])
+                {
+                    JObject eventObj = JObject.Parse(events[i/2].ToString());
+                    Name = (string)eventObj["Name"];
+                    Desc = (string)eventObj["Desc"];
+                }
+            }
         }
+
+        public string Name { get => name; set => name = value; }
+        public string Desc { get => desc; set => desc = value; }
     }
 
     class HistoricalEvent
@@ -284,6 +296,7 @@ namespace RPGv2
         public int Pop { get => pop; set => pop = value; }
         internal Race Race { get => race; set => race = value; }
         public string Name { get => name; set => name = value; }
+        internal List<HistoricalEvent> HistoricalEvents { get => historicalEvents; set => historicalEvents = value; }
 
         public Faction(Race r, string n)
         {
