@@ -26,6 +26,17 @@ namespace RPGv2
                 }
             }
         }
+
+        private static readonly Random random = new Random();
+        private static readonly object syncLock = new object();
+
+        public static int RandomNumber(int min, int max)
+        {
+            lock (syncLock)
+            { // synchronize
+                return random.Next(min, max);
+            }
+        }
         public static bool Start(bool done)
         {
             Console.Clear();
@@ -234,8 +245,7 @@ namespace RPGv2
     {
         string name;
         string desc;
-        private static readonly Random random = new Random();
-        private static readonly object syncLock = new object();
+
 
         public Event()
         {
@@ -243,7 +253,7 @@ namespace RPGv2
             int chanceTotal = 0;
             foreach (JObject o in events)
                 chanceTotal += (int)o["Chance"];
-            int num = RandomNumber(0, chanceTotal);
+            int num = HelperClasses.RandomNumber(0, chanceTotal);
             List<int> minMax = new List<int>();
             minMax.Add(0);
             for (int i = 1, j = 0; j < events.Count; i++)
@@ -268,221 +278,255 @@ namespace RPGv2
 
         }
 
-        
-        public static int RandomNumber(int min, int max)
+
+
+        public string Name { get => name; set => name = value; }
+        public string Desc { get => desc; set => desc = value; }
+    }
+    class WarEvent
+    {
+        string name;
+        string desc;
+
+
+        public WarEvent()
         {
-            lock (syncLock)
-            { // synchronize
-                return random.Next(min, max);
+            JArray events = JArray.Parse(File.ReadAllText(@"Dependencies\warevents.json"));
+            int chanceTotal = 0;
+            foreach (JObject o in events)
+                chanceTotal += (int)o["Chance"];
+            int num = HelperClasses.RandomNumber(0, chanceTotal);
+            List<int> minMax = new List<int>();
+            minMax.Add(0);
+            for (int i = 1, j = 0; j < events.Count; i++)
+            {
+                if (i % 2 == 1)
+                {
+                    minMax.Add((int)events[j]["Chance"] + minMax[i - 1] - 1);
+                    j++;
+                }
+                else
+                    minMax.Add(minMax[i - 1] + 1);
+            }
+            for (int i = 0; i < minMax.Count - 1; i++)
+            {
+                if (num >= minMax[i] && num <= minMax[i + 1])
+                {
+                    JObject eventObj = JObject.Parse(events[i / 2].ToString());
+                    Name = (string)eventObj["Name"];
+                    Desc = (string)eventObj["Desc"];
+                }
+            }
+
+        }
+
+
+
+        public string Name { get => name; set => name = value; }
+        public string Desc { get => desc; set => desc = value; }
+    }
+    class HistoricalEvent
+    {
+        string name;
+        int year;
+
+        public HistoricalEvent(string n, int y)
+        {
+            Name = n;
+            Year = y;
+        }
+
+        public string Name { get => name; set => name = value; }
+        public int Year { get => year; set => year = value; }
+    }
+
+    class Faction
+    {
+        string name;
+        Race race;
+        int pop = 0;
+        List<string> advances = new List<string>();
+        List<Faction> war = new List<Faction>();
+        List<HistoricalEvent> historicalEvents = new List<HistoricalEvent>();
+
+        public int Pop { get => pop; set => pop = value; }
+        internal Race Race { get => race; set => race = value; }
+        public string Name { get => name; set => name = value; }
+        internal List<HistoricalEvent> HistoricalEvents { get => historicalEvents; set => historicalEvents = value; }
+        internal List<Faction> War { get => war; set => war = value; }
+
+        public Faction(Race r, string n)
+        {
+            Name = n;
+            Race = r;
+        }
+
+        public Faction(Race r)
+        {
+            string[] factionNames = File.ReadAllLines(@"Dependencies\FactionNames.txt");
+            Name = factionNames[new Random().Next(factionNames.Length)];
+            Race = r;
+        }
+       
+        public void AddPop(int add) { Pop += add; }
+
+        public override string ToString()
+        {
+            return String.Format("Name: {0}\nPop: {1}", Name, pop);
+        }
+    }
+
+    class History
+    {
+        List<Race> races = new List<Race>();
+        List<Faction> factions = new List<Faction>();
+
+        internal List<Race> Races { get => races; set => races = value; }
+        internal List<Faction> Factions { get => factions; set => factions = value; }
+    }
+
+    internal class Player
+    {
+        private string name;
+        private string cla;
+        private string race;
+        private string faction;
+        private int att;
+        private int matk;
+        private int def;
+        private int mdef;
+        private int intel;
+        private double money;
+        private double luck;
+        private double eva;
+        public Player(int slot)
+        {
+            JArray saves = JArray.Parse(File.ReadAllText(@"Dependencies\player.json"));
+            JObject save = JObject.Parse(saves[slot - 1].ToString());
+            if (string.IsNullOrEmpty(save["Name"].ToString()))
+            {
+                CreateCharacter(slot, saves);
             }
         }
 
         public string Name { get => name; set => name = value; }
-    public string Desc { get => desc; set => desc = value; }
-}
+        public string Cla { get => cla; set => cla = value; }
+        public string Race { get => race; set => race = value; }
+        public string Faction { get => faction; set => faction = value; }
 
-class HistoricalEvent
-{
-    string name;
-    int year;
-
-    public HistoricalEvent(string n, int y)
-    {
-        Name = n;
-        Year = y;
-    }
-
-    public string Name { get => name; set => name = value; }
-    public int Year { get => year; set => year = value; }
-}
-
-class Faction
-{
-    string name;
-    Race race;
-    int pop = 0;
-    List<string> advances = new List<string>();
-    List<Faction> war = new List<Faction>();
-    List<HistoricalEvent> historicalEvents = new List<HistoricalEvent>();
-
-    public int Pop { get => pop; set => pop = value; }
-    internal Race Race { get => race; set => race = value; }
-    public string Name { get => name; set => name = value; }
-    internal List<HistoricalEvent> HistoricalEvents { get => historicalEvents; set => historicalEvents = value; }
-    internal List<Faction> War { get => war; set => war = value; }
-
-    public Faction(Race r, string n)
-    {
-        Name = n;
-        Race = r;
-    }
-
-    public Faction(Race r)
-    {
-        string[] factionNames = File.ReadAllLines(@"Dependencies\FactionNames.txt");
-        Name = factionNames[new Random().Next(factionNames.Length)];
-        Race = r;
-    }
-
-    public void AddPop(int add) { Pop += add; }
-
-    public override string ToString()
-    {
-        return String.Format("Name: {0}\nPop: {1}", Name, pop);
-    }
-}
-
-class History
-{
-    List<Race> races = new List<Race>();
-    List<Faction> factions = new List<Faction>();
-
-    internal List<Race> Races { get => races; set => races = value; }
-    internal List<Faction> Factions { get => factions; set => factions = value; }
-}
-
-internal class Player
-{
-    private string name;
-    private string cla;
-    private string race;
-    private string faction;
-    private int att;
-    private int matk;
-    private int def;
-    private int mdef;
-    private int intel;
-    private double money;
-    private double luck;
-    private double eva;
-    public Player(int slot)
-    {
-        JArray saves = JArray.Parse(File.ReadAllText(@"Dependencies\player.json"));
-        JObject save = JObject.Parse(saves[slot - 1].ToString());
-        if (string.IsNullOrEmpty(save["Name"].ToString()))
+        public void CreateCharacter(int slot, JArray arr)
         {
-            CreateCharacter(slot, saves);
-        }
-    }
-
-    public string Name { get => name; set => name = value; }
-    public string Cla { get => cla; set => cla = value; }
-    public string Race { get => race; set => race = value; }
-    public string Faction { get => faction; set => faction = value; }
-
-    public void CreateCharacter(int slot, JArray arr)
-    {
-        JObject save = JObject.Parse(arr[slot - 1].ToString());
-        Console.Write("Enter Name: ");
-        Name = Console.ReadLine();
-        save["Name"] = Name;
-        int inp = HelperClasses.MultipleChoice(false, "Mage", "Warrior", "Rogue");
-        switch (inp)
-        {
-            case 1:
-                Cla = "Mage";
-                att = 2;
-                matk = 7;
-                def = 1;
-                mdef = 5;
-                intel = 9;
-                money = 0;
-                luck = 4;
-                eva = 3;
-                break;
-            case 2:
-                Cla = "Warrior";
-                att = 9;
-                matk = 2;
-                def = 5;
-                mdef = 3;
-                intel = 4;
-                money = 0;
-                luck = 2;
-                eva = 2;
-                break;
-            case 3:
-                Cla = "Rogue";
-                att = 6;
-                matk = 4;
-                def = 2;
-                mdef = 3;
-                intel = 6;
-                money = 0;
-                luck = 8;
-                eva = 8;
-                break;
-            default:
-                break;
-        }
-        save["Class"] = Cla;
-        save["Attack"] = att;
-        save["Defense"] = def;
-        save["Magic Attack"] = matk;
-        save["Magic Defense"] = mdef;
-        save["Intelligence"] = intel;
-        save["Money"] = money;
-        save["Luck"] = luck;
-        save["Evasion"] = eva;
-        Console.WriteLine((string)save["Name"]);
-        arr[slot - 1] = JArray.Parse(save.ToString());
-        File.WriteAllText(@"Dependencies\player.json", arr.ToString());
-    }
-}
-
-internal class Sword
-{
-    private readonly string name;
-    private readonly int att;
-    private readonly int def;
-    private readonly int buyPrice;
-    private readonly int sellPrice;
-    private readonly int rarity;
-    public Sword(int index)
-    {
-        JArray array = JArray.Parse(File.ReadAllText(@"Dependencies\sword.json"));
-        JObject obj = JObject.Parse(array[index].ToString());
-        name = (string)obj["Name"];
-        att = (int)obj["Attack"];
-        def = (int)obj["Defense"];
-        buyPrice = (int)obj["Buy Price"];
-        sellPrice = (int)obj["Sell Price"];
-        rarity = (int)obj["Rarity Level"];
-    }
-    public Sword(string n)
-    {
-        JArray array = JArray.Parse(File.ReadAllText(@"Dependencies\sword.json"));
-        foreach (JObject obj in array)
-        {
-            if (obj["Name"].ToString() == n)
+            JObject save = JObject.Parse(arr[slot - 1].ToString());
+            Console.Write("Enter Name: ");
+            Name = Console.ReadLine();
+            save["Name"] = Name;
+            int inp = HelperClasses.MultipleChoice(false, "Mage", "Warrior", "Rogue");
+            switch (inp)
             {
-                name = (string)obj["Name"];
-                att = (int)obj["Attack"];
-                def = (int)obj["Defense"];
-                buyPrice = (int)obj["Buy Price"];
-                sellPrice = (int)obj["Sell Price"];
-                rarity = (int)obj["Rarity Level"];
+                case 1:
+                    Cla = "Mage";
+                    att = 2;
+                    matk = 7;
+                    def = 1;
+                    mdef = 5;
+                    intel = 9;
+                    money = 0;
+                    luck = 4;
+                    eva = 3;
+                    break;
+                case 2:
+                    Cla = "Warrior";
+                    att = 9;
+                    matk = 2;
+                    def = 5;
+                    mdef = 3;
+                    intel = 4;
+                    money = 0;
+                    luck = 2;
+                    eva = 2;
+                    break;
+                case 3:
+                    Cla = "Rogue";
+                    att = 6;
+                    matk = 4;
+                    def = 2;
+                    mdef = 3;
+                    intel = 6;
+                    money = 0;
+                    luck = 8;
+                    eva = 8;
+                    break;
+                default:
+                    break;
             }
+            save["Class"] = Cla;
+            save["Attack"] = att;
+            save["Defense"] = def;
+            save["Magic Attack"] = matk;
+            save["Magic Defense"] = mdef;
+            save["Intelligence"] = intel;
+            save["Money"] = money;
+            save["Luck"] = luck;
+            save["Evasion"] = eva;
+            Console.WriteLine((string)save["Name"]);
+            arr[slot - 1] = JArray.Parse(save.ToString());
+            File.WriteAllText(@"Dependencies\player.json", arr.ToString());
         }
-        if (string.IsNullOrEmpty(name))
-            throw new InvalidOperationException("Unable to find sword: " + n);
     }
 
-    public override string ToString()
+    internal class Sword
     {
-        string output = "";
-        string.Format(output, "Name: {0}\nAttack: {1}\nDefense: {2}\nBuy Price:{3}\n Sell Price: {4}\nRarity Level: {5}", name, att, def, buyPrice, sellPrice, rarity);
-        return output;
-    }
+        private readonly string name;
+        private readonly int att;
+        private readonly int def;
+        private readonly int buyPrice;
+        private readonly int sellPrice;
+        private readonly int rarity;
+        public Sword(int index)
+        {
+            JArray array = JArray.Parse(File.ReadAllText(@"Dependencies\sword.json"));
+            JObject obj = JObject.Parse(array[index].ToString());
+            name = (string)obj["Name"];
+            att = (int)obj["Attack"];
+            def = (int)obj["Defense"];
+            buyPrice = (int)obj["Buy Price"];
+            sellPrice = (int)obj["Sell Price"];
+            rarity = (int)obj["Rarity Level"];
+        }
+        public Sword(string n)
+        {
+            JArray array = JArray.Parse(File.ReadAllText(@"Dependencies\sword.json"));
+            foreach (JObject obj in array)
+            {
+                if (obj["Name"].ToString() == n)
+                {
+                    name = (string)obj["Name"];
+                    att = (int)obj["Attack"];
+                    def = (int)obj["Defense"];
+                    buyPrice = (int)obj["Buy Price"];
+                    sellPrice = (int)obj["Sell Price"];
+                    rarity = (int)obj["Rarity Level"];
+                }
+            }
+            if (string.IsNullOrEmpty(name))
+                throw new InvalidOperationException("Unable to find sword: " + n);
+        }
 
-    public string GetName()
-    {
-        return name;
-    }
+        public override string ToString()
+        {
+            string output = "";
+            string.Format(output, "Name: {0}\nAttack: {1}\nDefense: {2}\nBuy Price:{3}\n Sell Price: {4}\nRarity Level: {5}", name, att, def, buyPrice, sellPrice, rarity);
+            return output;
+        }
 
-    public int[] GetVals()
-    {
-        return new int[] { att, def, buyPrice, sellPrice };
+        public string GetName()
+        {
+            return name;
+        }
+
+        public int[] GetVals()
+        {
+            return new int[] { att, def, buyPrice, sellPrice };
+        }
     }
-}
 }
