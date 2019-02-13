@@ -21,7 +21,7 @@ namespace RPGv2
             List<Faction> factions = new List<Faction>();
             for (int i = 0; i < Race.RacesAmount(); i++)
             {
-                races.Add(new Race(i, new Random().Next(2000000)));
+                races.Add(new Race(i, new Random().Next(20000)));
             }
             Random rand = new Random();
             for (int i = 0; i < races.Count; i++)
@@ -79,6 +79,7 @@ namespace RPGv2
                 totalPeople += f.Pop;
             for (int i = 0; i <= years; i++)
             {
+                #region events
                 for (int j = 0; j < factions.Count; j++)
                 {
                     int chainAmount = 0;
@@ -161,6 +162,23 @@ namespace RPGv2
                         chainAmount--;
                     } while (chainAmount > 0);
                 }
+                #endregion
+                #region warhandling
+                List<Faction> handled = new List<Faction>();
+                for(int j = 0; j<factions.Count; j++)
+                {
+                    Faction f = factions[j];
+                    if(f.War.Count != 0 || handled.Contains(factions[j]))
+                    {
+                        for(int k = 0; k < f.War.Count; k++)
+                        {
+                            Faction warWith = f.War[k];
+                            handled.Add(warWith);
+                            int randNum = HelperClasses.RandomNumber(0,500);
+                        }
+                    }
+                }
+                #endregion
             }
             h.Races = races;
             h.Factions = factions;
