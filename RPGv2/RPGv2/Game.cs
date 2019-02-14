@@ -11,6 +11,26 @@ namespace RPGv2
             History h = StartHistory(int.Parse(Console.ReadLine()));
             foreach (Faction f in h.Factions)
                 Console.WriteLine(f.ToString());
+            bool done = false;
+            while(!done)
+            {
+                Console.Write(">");
+                string[] inp = Console.ReadLine().Split(' ');
+                switch(inp[0])
+                {
+                    case "get":
+                        foreach (Faction fac in h.Factions)
+                            if (fac.Name == inp[1])
+                            {
+                                Console.WriteLine(fac.ToString());
+                            }
+
+                        break;
+                    default:
+                        done = true;
+                        break;
+                }
+            }
             Console.ReadKey();
         }
         public static History StartHistory(int years)
@@ -33,12 +53,12 @@ namespace RPGv2
                 for (int j = 0; j <= vals[3]; j++)
                 {
                     int num = rand.Next(100);
-                    if (num < 70)
+                    if (num < 60)
                     {
                         factions[mainCityInd].Pop++;
                         num = 101;
                     }
-                    if (num < 95)
+                    if (num < 80)
                     {
                         bool done = false;
                         Random rand2 = new Random();
@@ -100,7 +120,7 @@ namespace RPGv2
                             #endregion
                             #region famine
                             case "Famine":
-                                int deathChance = new Random().Next(100);
+                                int deathChance = new Random().Next(70);
                                 Random rando = new Random();
                                 f.Pop -= Convert.ToInt32(f.Pop * (deathChance / 100.0));
                                 if (deathChance < 10)
@@ -143,7 +163,6 @@ namespace RPGv2
                                 {
                                     if (factions[k].Race != f.Race && factions[k] != f && f.Pop > factions[k].Pop / 2 && f.Pop < factions[k].Pop * 2)
                                     {
-                                        Console.WriteLine(f.Name + " <3 " + factions[k].Name);
                                         canFind = true;
                                     }
                                 }
@@ -155,7 +174,6 @@ namespace RPGv2
                                 {
                                     int num = rand.Next(factions.Count);
                                     opp = factions[num];
-                                    Console.WriteLine(f.Name + ' ' + opp.Name);
                                     if (opp.Race != f.Race && opp != f && f.Pop > opp.Pop / 2 && f.Pop < opp.Pop * 2)
                                         doneFinding = true;
                                 }

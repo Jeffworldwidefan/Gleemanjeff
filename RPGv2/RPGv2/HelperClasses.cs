@@ -9,6 +9,10 @@ namespace RPGv2
     {
         private static void Main(string[] args)
         {
+            //init
+            DefaultRestore.BackupEvent();
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
+            //end init
             StateManager sm = new StateManager();
             bool done = false;
             while (!done)
@@ -25,6 +29,11 @@ namespace RPGv2
                         break;
                 }
             }
+        }
+
+        static void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        {
+            DefaultRestore.SetEventDefault();
         }
 
         private static readonly Random random = new Random();
@@ -503,6 +512,22 @@ namespace RPGv2
         }
     }
 
+    class DefaultRestore
+    {
+        private static string eventJson;
+
+        public static void BackupEvent()
+        {
+            eventJson = File.ReadAllText(@"Dependencies\events.json");
+        }
+
+        public static void SetEventDefault()
+        {
+
+            File.WriteAllText(@"Dependencies\events.json", eventJson);
+        }
+    }
+    
     internal class Sword
     {
         private readonly string name;

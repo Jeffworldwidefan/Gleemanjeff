@@ -12,17 +12,17 @@
   {
     "Name": "Population Up",
     "Desc": "Population increases based on the amount of people in the faction",
-    "Chance": 100
+    "Chance": 110
   },
   {
     "Name": "Population Down",
     "Desc": "Population decreases based on the amount of people in the faction",
-    "Chance": 90
+    "Chance": 80
   },
   {
     "Name": "War Declaration",
     "Desc": "War is declared on an opposing faction, factions can be destroyed or wounded from this.",
-    "Chance": 7
+    "Chance": 3
   },
   {
     "Name": "Famine",
@@ -33,5 +33,10 @@
     "Name": "Discovery",
     "Desc": "Chance at discovery based on intelligence",
     "Chance": 20
+  },
+  {
+    "Name": "je",
+    "Desc": "ne",
+    "Chance": 40
   }
 ]
