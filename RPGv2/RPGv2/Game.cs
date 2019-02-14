@@ -102,7 +102,7 @@ namespace RPGv2
                             case "Famine":
                                 int deathChance = new Random().Next(100);
                                 Random rando = new Random();
-                                f.Pop -= Convert.ToInt32(f.Pop * (deathChance/100.0));
+                                f.Pop -= Convert.ToInt32(f.Pop * (deathChance / 100.0));
                                 if (deathChance < 10)
                                 {
                                     f.HistoricalEvents.Add(new HistoricalEvent("slight famine", i));
@@ -133,21 +133,33 @@ namespace RPGv2
                             #endregion
                             #region popdown
                             case "Population Down":
-                                int percentDown = new Random().Next(1, 20);
+                                int percentDown = new Random().Next(1, 10);
                                 f.Pop += Convert.ToInt32(f.Pop * (percentDown / 100.0));
                                 break;
                             #endregion
                             case "War Declaration":
+                                bool canFind = false;
+                                for(int k = 0; k<factions.Count; k++)
+                                {
+                                    if (factions[k].Race != f.Race && factions[k] != f && f.Pop > factions[k].Pop / 2 && f.Pop < factions[k].Pop * 2)
+                                    {
+                                        Console.WriteLine(f.Name + " <3 " + factions[k].Name);
+                                        canFind = true;
+                                    }
+                                }
+                                if (!canFind)
+                                    break;
                                 bool doneFinding = false;
                                 Faction opp = new Faction(new Race(0, 0));
                                 while (!doneFinding)
                                 {
                                     int num = rand.Next(factions.Count);
                                     opp = factions[num];
-                                    if (opp.Race != f.Race)
+                                    Console.WriteLine(f.Name + ' ' + opp.Name);
+                                    if (opp.Race != f.Race && opp != f && f.Pop > opp.Pop / 2 && f.Pop < opp.Pop * 2)
                                         doneFinding = true;
                                 }
-                                f.War.Add(opp);
+                                f.Wars.Add(new War(i, f, opp));
                                 break;
                             case "Discovery":
                                 break;
@@ -164,18 +176,72 @@ namespace RPGv2
                 }
                 #endregion
                 #region warhandling
-                List<Faction> handled = new List<Faction>();
-                for(int j = 0; j<factions.Count; j++)
+                for (int j = 0; j < factions.Count; j++)
                 {
                     Faction f = factions[j];
-                    if(f.War.Count != 0 || handled.Contains(factions[j]))
-                    {
-                        for(int k = 0; k < f.War.Count; k++)
+                    bool inWar = false;
+                    List<War> wars = new List<War>();
+                    foreach (War w in f.Wars)
+                        if (w.OnGoing)
                         {
-                            Faction warWith = f.War[k];
-                            handled.Add(warWith);
-                            int randNum = HelperClasses.RandomNumber(0,500);
+                            inWar = true;
+                            wars.Add(w);
                         }
+                    if (inWar)
+                    {
+                        for (int k = 0; k < wars.Count; k++)
+                        {
+                            Faction warWith = wars[k].Side2;
+                            WarEvent we = new WarEvent();
+                            switch(we.Name)
+                            {
+                                case "None":
+                                    wars[k].Length++;
+                                    break;
+                                case "Attack":
+                                    for(int l = 0; l<f.Pop+ warWith.Pop; l++)
+                                    {
+                                        int num1 = HelperClasses.RandomNumber(0, f.Race.GetVals()[2] + (f.Race.GetVals()[1] / 2) + f.Race.GetVals()[0]);
+                                        int num2 = HelperClasses.RandomNumber(0, warWith.Race.GetVals()[1] + (warWith.Race.GetVals()[2] / 2) + warWith.Race.GetVals()[0]);
+                                        if (num1 >= num2)
+                                            warWith.Pop--;
+                                        else
+                                            f.Pop--;
+                                    }
+                                    wars[k].Length++;
+                                    break;
+                                case "Defend":
+                                    for (int l = 0; l < f.Pop + warWith.Pop; l++)
+                                    {
+                                        int num1 = HelperClasses.RandomNumber(0, warWith.Race.GetVals()[1] + (warWith.Race.GetVals()[2]/2) + warWith.Race.GetVals()[0]);
+                                        int num2 = HelperClasses.RandomNumber(0, f.Race.GetVals()[2] + (f.Race.GetVals()[1] / 2) + f.Race.GetVals()[0]);
+                                        if (num1 >= num2)
+                                            f.Pop--;
+                                        else
+                                            warWith.Pop--;
+                                    }
+                                    wars[k].Length++;
+                                    break;
+                                case "End War":
+                                    wars[k].OnGoing = false;
+                                    f.HistoricalEvents.Add(new HistoricalEvent(String.Format("At war with {0} for {1} years",wars[k].Side2,wars[k].Length), i));
+                                    break;
+                                default:
+                                    Console.Clear();
+                                    Console.WriteLine("An unknown event has occured, name: {0}", we.Name);
+                                    Console.ReadKey();
+                                    break;
+                            }
+                        }
+                    }
+                }
+                for (int i1 = 0; i1 < factions.Count; i1++)
+                {
+                    Faction f = factions[i1];
+                    if (f.Pop <= 0)
+                    {
+                        factions.Remove(f);
+                        Console.WriteLine("{0} has fallen!", f.Name);
                     }
                 }
                 #endregion

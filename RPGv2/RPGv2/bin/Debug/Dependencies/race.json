@@ -16,5 +16,11 @@
     "Intelligence": 26,
     "BaseAttack": 7,
     "BaseDefense": 5
+  },
+  {
+    "Name": "Stronnothyes",
+    "Intelligence": 40,
+    "BaseAttack": 12,
+    "BaseDefense": 2
   }
 ]

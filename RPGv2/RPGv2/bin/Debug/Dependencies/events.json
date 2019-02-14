@@ -1,8 +1,8 @@
 [
   {
-    "Name": "None",
-    "Desc": "Nothing happens.",
-    "Chance": 775
+    "Name": "War Declaration",
+    "Desc": "War is declared on an opposing faction, factions can be destroyed or wounded from this.",
+    "Chance": 4
   },
   {
     "Name": "Chain Event",
@@ -12,7 +12,7 @@
   {
     "Name": "Population Up",
     "Desc": "Population increases based on the amount of people in the faction",
-    "Chance": 90
+    "Chance": 100
   },
   {
     "Name": "Population Down",
@@ -22,7 +22,7 @@
   {
     "Name": "War Declaration",
     "Desc": "War is declared on an opposing faction, factions can be destroyed or wounded from this.",
-    "Chance": 10
+    "Chance": 7
   },
   {
     "Name": "Famine",

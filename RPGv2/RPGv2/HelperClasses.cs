@@ -240,7 +240,35 @@ namespace RPGv2
         public int[] GetVals() => new int[] { intelligence, baseAtt, baseDef, pop };
         public static int RacesAmount() => JArray.Parse(File.ReadAllText(@"Dependencies\race.json")).Count;
     }
+    
+    class War
+    {
+        private int length = 0;
+        private string name;
+        private int startYear;
+        private Faction side1;
+        private Faction side2;
+        private bool onGoing = true;
 
+
+
+        public War(int year, Faction s1, Faction s2)
+        {
+            string[] warNames = File.ReadAllLines(@"Dependencies\WarNames.txt");
+            Name = warNames[new Random().Next(warNames.Length)];
+            StartYear = year;
+            Side1 = s1;
+            Side2 = s2;
+        }
+
+        public int Length { get => length; set => length = value; }
+        public string Name { get => name; set => name = value; }
+        public int StartYear { get => startYear; set => startYear = value; }
+        public bool OnGoing { get => onGoing; set => onGoing = value; }
+        internal Faction Side1 { get => side1; set => side1 = value; }
+        internal Faction Side2 { get => side2; set => side2 = value; }
+    }
+    
     class Event
     {
         string name;
@@ -283,6 +311,7 @@ namespace RPGv2
         public string Name { get => name; set => name = value; }
         public string Desc { get => desc; set => desc = value; }
     }
+
     class WarEvent
     {
         string name;
@@ -346,14 +375,14 @@ namespace RPGv2
         Race race;
         int pop = 0;
         List<string> advances = new List<string>();
-        List<Faction> war = new List<Faction>();
+        List<War> wars = new List<War>();
         List<HistoricalEvent> historicalEvents = new List<HistoricalEvent>();
 
         public int Pop { get => pop; set => pop = value; }
         internal Race Race { get => race; set => race = value; }
         public string Name { get => name; set => name = value; }
         internal List<HistoricalEvent> HistoricalEvents { get => historicalEvents; set => historicalEvents = value; }
-        internal List<Faction> War { get => war; set => war = value; }
+        internal List<War> Wars { get => wars; set => wars = value; }
 
         public Faction(Race r, string n)
         {
