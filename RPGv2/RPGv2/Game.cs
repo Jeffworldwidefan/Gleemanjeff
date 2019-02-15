@@ -24,7 +24,6 @@ namespace RPGv2
                             {
                                 Console.WriteLine(fac.ToString());
                             }
-
                         break;
                     default:
                         done = true;
@@ -97,8 +96,15 @@ namespace RPGv2
             int totalPeople = 0;
             foreach (Faction f in factions)
                 totalPeople += f.Pop;
+            double averagePopSeverity = 0;
             for (int i = 0; i <= years; i++)
             {
+                foreach(Faction f in factions)
+                {
+                    f.PopSeverity = (double)f.Pop / totalPeople;
+                    averagePopSeverity += f.PopSeverity;
+                }
+                averagePopSeverity /= factions.Count;
                 #region events
                 for (int j = 0; j < factions.Count; j++)
                 {

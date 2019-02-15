@@ -9,10 +9,6 @@ namespace RPGv2
     {
         private static void Main(string[] args)
         {
-            //init
-            DefaultRestore.BackupEvent();
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
-            //end init
             StateManager sm = new StateManager();
             bool done = false;
             while (!done)
@@ -29,11 +25,6 @@ namespace RPGv2
                         break;
                 }
             }
-        }
-
-        static void CurrentDomain_ProcessExit(object sender, EventArgs e)
-        {
-            DefaultRestore.SetEventDefault();
         }
 
         private static readonly Random random = new Random();
@@ -383,15 +374,19 @@ namespace RPGv2
         string name;
         Race race;
         int pop = 0;
+        double popSeverity;
         List<string> advances = new List<string>();
         List<War> wars = new List<War>();
         List<HistoricalEvent> historicalEvents = new List<HistoricalEvent>();
+
 
         public int Pop { get => pop; set => pop = value; }
         internal Race Race { get => race; set => race = value; }
         public string Name { get => name; set => name = value; }
         internal List<HistoricalEvent> HistoricalEvents { get => historicalEvents; set => historicalEvents = value; }
         internal List<War> Wars { get => wars; set => wars = value; }
+        public List<string> Advances { get => advances; set => advances = value; }
+        public double PopSeverity { get => popSeverity; set => popSeverity = value; }
 
         public Faction(Race r, string n)
         {
@@ -410,7 +405,7 @@ namespace RPGv2
 
         public override string ToString()
         {
-            return String.Format("Name: {0}\nPop: {1}", Name, pop);
+            return String.Format("Name: {0}\nRace: {1}\nPop: {2}\nSeverity: {3}", name, race.Name, pop, popSeverity);
         }
     }
 

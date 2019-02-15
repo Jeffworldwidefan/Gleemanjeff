@@ -1,5 +1,10 @@
 [
   {
+    "Name": "None",
+    "Desc": "Nothing happens",
+    "Chance": 600
+  },
+  {
     "Name": "War Declaration",
     "Desc": "War is declared on an opposing faction, factions can be destroyed or wounded from this.",
     "Chance": 4
@@ -17,12 +22,12 @@
   {
     "Name": "Population Down",
     "Desc": "Population decreases based on the amount of people in the faction",
-    "Chance": 80
+    "Chance": 90
   },
   {
     "Name": "War Declaration",
     "Desc": "War is declared on an opposing faction, factions can be destroyed or wounded from this.",
-    "Chance": 3
+    "Chance": 2
   },
   {
     "Name": "Famine",
@@ -33,10 +38,5 @@
     "Name": "Discovery",
     "Desc": "Chance at discovery based on intelligence",
     "Chance": 20
-  },
-  {
-    "Name": "je",
-    "Desc": "ne",
-    "Chance": 40
   }
 ]
