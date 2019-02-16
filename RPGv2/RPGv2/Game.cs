@@ -34,7 +34,7 @@ namespace RPGv2
         }
         public static History StartHistory(int years)
         {
-
+            EventList el = new EventList();
             History h = new History();
             List<Race> races = new List<Race>();
             List<Faction> factions = new List<Faction>();
@@ -109,10 +109,11 @@ namespace RPGv2
                 for (int j = 0; j < factions.Count; j++)
                 {
                     int chainAmount = 0;
+                    Faction f = factions[j];
                     do
                     {
-                        Faction f = factions[j];
-                        Event e = new Event();
+                        Event newEvent = new Event(el);
+                        EventVar e = newEvent.Chosen;
                         switch (e.Name)
                         {
                             #region none
@@ -197,6 +198,22 @@ namespace RPGv2
                         }
                         chainAmount--;
                     } while (chainAmount > 0);
+                    #region pophandling
+                    int popNum = Convert.ToInt32(f.PopSeverity * 100000);
+                    int avePopNum = Convert.ToInt32(averagePopSeverity * 100000);
+                    int popRand = HelperClasses.RandomNumber(0, popNum);
+                    int avePopRand = HelperClasses.RandomNumber(0, avePopNum);
+                    if(popRand > avePopNum)
+                    {
+                        foreach (EventVar ev in el.Events)
+                        {
+                            ev.Chance += ev.Rate;
+                            ev.ChanceCheck();
+                        }
+                    } else
+                        foreach (EventVar ev in el.Events)
+                            ev.Chance = ev.DefChance;
+                    #endregion
                 }
                 #endregion
                 #region warhandling

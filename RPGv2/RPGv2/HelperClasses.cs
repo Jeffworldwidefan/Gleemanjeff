@@ -75,6 +75,8 @@ namespace RPGv2
                                     o[options[i]] = int.Parse(newVal);
                                 if (o[options[i]].Type == JTokenType.Float)
                                     o[options[i]] = float.Parse(newVal);
+                                if (o[options[i]].Type == JTokenType.Boolean)
+                                    o[options[i]] = bool.Parse(newVal);
                             }
                             arr.Add(o);
                             File.WriteAllText(path, arr.ToString());
@@ -268,19 +270,76 @@ namespace RPGv2
         internal Faction Side1 { get => side1; set => side1 = value; }
         internal Faction Side2 { get => side2; set => side2 = value; }
     }
-    
-    class Event
+
+    class EventVar
     {
         string name;
         string desc;
+        int chance;
+        int defChance;
+        int rate;
 
-
-        public Event()
+        public EventVar(string n, string d, int c, int r)
         {
-            JArray events = JArray.Parse(File.ReadAllText(@"Dependencies\events.json"));
+            Name = n;
+            Desc = d;
+            Chance = c;
+            DefChance = c;
+            Rate = r;
+        }
+
+        public void ChanceCheck()
+        {
+            if (Chance <= 0)
+                Chance = DefChance;
+        }
+
+        public string Name { get => name; set => name = value; }
+        public string Desc { get => desc; set => desc = value; }
+        public int Chance { get => chance; set => chance = value; }
+        public int Rate { get => rate; set => rate = value; }
+        public int DefChance { get => defChance; set => defChance = value; }
+    }
+
+    class EventList
+    {
+        List<EventVar> events = new List<EventVar>();
+
+        public EventList()
+        {
+            JArray eventArray = JArray.Parse(File.ReadAllText(@"Dependencies\events.json"));
+            foreach (JObject o in eventArray)
+            {
+                events.Add(new EventVar((string)o["Name"], (string)o["Desc"], (int)o["Chance"], (int)o["Rate"]));
+            }
+        }
+
+        internal List<EventVar> Events { get => events; set => events = value; }
+
+        public void ChangeChance(string e, int val)
+        {
+            foreach(EventVar v in Events)
+            {
+                if (v.Name == e)
+                {
+                    v.Chance = val;
+                    return;
+                }
+            }
+
+        }
+    }
+
+    class Event
+    {
+        EventVar chosen;
+
+        public Event(EventList el)
+        {
             int chanceTotal = 0;
-            foreach (JObject o in events)
-                chanceTotal += (int)o["Chance"];
+            List<EventVar> events = el.Events;
+            foreach (EventVar ev in events)
+                chanceTotal += ev.Chance;
             int num = HelperClasses.RandomNumber(0, chanceTotal);
             List<int> minMax = new List<int>();
             minMax.Add(0);
@@ -288,7 +347,7 @@ namespace RPGv2
             {
                 if (i % 2 == 1)
                 {
-                    minMax.Add((int)events[j]["Chance"] + minMax[i - 1] - 1);
+                    minMax.Add(events[j].Chance + minMax[i - 1] - 1);
                     j++;
                 }
                 else
@@ -298,18 +357,13 @@ namespace RPGv2
             {
                 if (num >= minMax[i] && num <= minMax[i + 1])
                 {
-                    JObject eventObj = JObject.Parse(events[i / 2].ToString());
-                    Name = (string)eventObj["Name"];
-                    Desc = (string)eventObj["Desc"];
+                    Chosen = events[i / 2];
                 }
             }
 
         }
 
-
-
-        public string Name { get => name; set => name = value; }
-        public string Desc { get => desc; set => desc = value; }
+        internal EventVar Chosen { get => chosen; set => chosen = value; }
     }
 
     class WarEvent
@@ -402,6 +456,11 @@ namespace RPGv2
         }
        
         public void AddPop(int add) { Pop += add; }
+
+        public void CheckSeverity()
+        {
+
+        }
 
         public override string ToString()
         {
