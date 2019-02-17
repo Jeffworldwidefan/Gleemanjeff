@@ -8,7 +8,7 @@ namespace RPGv2
     internal class HelperClasses
     {
         private static void Main(string[] args)
-        {
+        { 
             StateManager sm = new StateManager();
             bool done = false;
             while (!done)

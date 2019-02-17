@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace RPGv2
 {
@@ -7,16 +8,21 @@ namespace RPGv2
     {
         public static void StartGame()
         {
-            Console.Write("Enter years of history: ");
-            History h = StartHistory(int.Parse(Console.ReadLine()));
+            int yearInput;
+            do { Console.Write("Enter years of history: "); } while (!int.TryParse(Console.ReadLine(), out yearInput));
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            History h = StartHistory(yearInput);
+            Console.Clear();
+            Console.WriteLine("Elapsed time: {0}", sw.Elapsed.Milliseconds/1000.0);
             foreach (Faction f in h.Factions)
                 Console.WriteLine(f.ToString());
             bool done = false;
-            while(!done)
+            while (!done)
             {
                 Console.Write(">");
                 string[] inp = Console.ReadLine().Split(' ');
-                switch(inp[0])
+                switch (inp[0])
                 {
                     case "get":
                         foreach (Faction fac in h.Factions)
@@ -34,13 +40,21 @@ namespace RPGv2
         }
         public static History StartHistory(int years)
         {
+            bool disp = true;
+
+            if (disp)
+            {
+                Console.Clear();
+                Console.WriteLine("Year: ");
+                Console.WriteLine("Event: ");
+            }
             EventList el = new EventList();
             History h = new History();
             List<Race> races = new List<Race>();
             List<Faction> factions = new List<Faction>();
             for (int i = 0; i < Race.RacesAmount(); i++)
             {
-                races.Add(new Race(i, new Random().Next(20000)));
+                races.Add(new Race(i, new Random().Next(30000)));
             }
             Random rand = new Random();
             for (int i = 0; i < races.Count; i++)
@@ -52,12 +66,12 @@ namespace RPGv2
                 for (int j = 0; j <= vals[3]; j++)
                 {
                     int num = rand.Next(100);
-                    if (num < 60)
+                    if (num < 80)
                     {
                         factions[mainCityInd].Pop++;
                         num = 101;
                     }
-                    if (num < 80)
+                    if (num < 95)
                     {
                         bool done = false;
                         Random rand2 = new Random();
@@ -94,26 +108,43 @@ namespace RPGv2
                 }
             }
             int totalPeople = 0;
-            foreach (Faction f in factions)
-                totalPeople += f.Pop;
             double averagePopSeverity = 0;
+            
             for (int i = 0; i <= years; i++)
             {
-                foreach(Faction f in factions)
+                if (disp)
+                {
+                    Console.SetCursorPosition(6, 0);
+                    Console.Write("                ");
+                    Console.SetCursorPosition(6, 0);
+                    Console.Write(i);
+                }
+                totalPeople = 0;
+                averagePopSeverity = 0;
+                foreach (Faction f in factions)
+                    totalPeople += f.Pop;
+                foreach (Faction f in factions)
                 {
                     f.PopSeverity = (double)f.Pop / totalPeople;
                     averagePopSeverity += f.PopSeverity;
                 }
                 averagePopSeverity /= factions.Count;
                 #region events
+                int chainAmount = 0;
                 for (int j = 0; j < factions.Count; j++)
                 {
-                    int chainAmount = 0;
                     Faction f = factions[j];
                     do
                     {
                         Event newEvent = new Event(el);
                         EventVar e = newEvent.Chosen;
+                        if (disp)
+                        {
+                            Console.SetCursorPosition(7, 1);
+                            Console.Write("                ");
+                            Console.SetCursorPosition(7, 1);
+                            Console.Write(e.Name);
+                        }
                         switch (e.Name)
                         {
                             #region none
@@ -166,7 +197,7 @@ namespace RPGv2
                             #endregion
                             case "War Declaration":
                                 bool canFind = false;
-                                for(int k = 0; k<factions.Count; k++)
+                                for (int k = 0; k < factions.Count; k++)
                                 {
                                     if (factions[k].Race != f.Race && factions[k] != f && f.Pop > factions[k].Pop / 2 && f.Pop < factions[k].Pop * 2)
                                     {
@@ -188,10 +219,25 @@ namespace RPGv2
                                 break;
                             case "Discovery":
                                 break;
+                            case "New Faction":
+                                int breakOff = HelperClasses.RandomNumber(1, f.Pop);
+                                Faction newFaction = new Faction(f.Race);
+                                newFaction.Pop += breakOff;
+                                f.Pop -= breakOff;
+                                factions.Add(newFaction);
+                                newFaction.HistoricalEvents.Add(new HistoricalEvent("Broke off from " + f.Name, i));
+                                if (disp)
+                                {
+                                    Console.SetCursorPosition(0, 3);
+                                    Console.Write("                                                                      ");
+                                    Console.SetCursorPosition(0, 3);
+                                    Console.Write("{0} has been created!", newFaction.Name);
+                                }
+                                break;
                             #region default
                             default:
                                 Console.Clear();
-                                Console.WriteLine("An unknown event has occured, name: {0}", e.Name);
+                                Console.WriteLine("An unknown event has occured, event name: {0}", e.Name);
                                 Console.ReadKey();
                                 break;
                                 #endregion
@@ -200,19 +246,23 @@ namespace RPGv2
                     } while (chainAmount > 0);
                     #region pophandling
                     int popNum = Convert.ToInt32(f.PopSeverity * 100000);
-                    int avePopNum = Convert.ToInt32(averagePopSeverity * 100000);
-                    int popRand = HelperClasses.RandomNumber(0, popNum);
-                    int avePopRand = HelperClasses.RandomNumber(0, avePopNum);
-                    if(popRand > avePopNum)
+                    if (popNum > 0)
                     {
-                        foreach (EventVar ev in el.Events)
+                        int avePopNum = Convert.ToInt32(averagePopSeverity * 100000);
+                        int popRand = HelperClasses.RandomNumber(0, popNum);
+                        int avePopRand = HelperClasses.RandomNumber(0, avePopNum);
+                        if (popRand > avePopNum)
                         {
-                            ev.Chance += ev.Rate;
-                            ev.ChanceCheck();
+                            foreach (EventVar ev in el.Events)
+                            {
+                                ev.Chance += ev.Rate;
+                                ev.ChanceCheck();
+                            }
                         }
-                    } else
-                        foreach (EventVar ev in el.Events)
-                            ev.Chance = ev.DefChance;
+                        else
+                            foreach (EventVar ev in el.Events)
+                                ev.Chance = ev.DefChance;
+                    }
                     #endregion
                 }
                 #endregion
@@ -234,16 +284,18 @@ namespace RPGv2
                         {
                             Faction warWith = wars[k].Side2;
                             WarEvent we = new WarEvent();
-                            switch(we.Name)
+                            int num1;
+                            int num2;
+                            switch (we.Name)
                             {
                                 case "None":
                                     wars[k].Length++;
                                     break;
                                 case "Attack":
-                                    for(int l = 0; l<f.Pop+ warWith.Pop; l++)
+                                    for (int l = 0; l < f.Pop + warWith.Pop; l++)
                                     {
-                                        int num1 = HelperClasses.RandomNumber(0, f.Race.GetVals()[2] + (f.Race.GetVals()[1] / 2) + f.Race.GetVals()[0]);
-                                        int num2 = HelperClasses.RandomNumber(0, warWith.Race.GetVals()[1] + (warWith.Race.GetVals()[2] / 2) + warWith.Race.GetVals()[0]);
+                                        num1 = HelperClasses.RandomNumber(0, f.Race.GetVals()[2] + (f.Race.GetVals()[1] / 2) + f.Race.GetVals()[0]);
+                                        num2 = HelperClasses.RandomNumber(0, warWith.Race.GetVals()[1] + (warWith.Race.GetVals()[2] / 2) + warWith.Race.GetVals()[0]);
                                         if (num1 >= num2)
                                             warWith.Pop--;
                                         else
@@ -254,8 +306,8 @@ namespace RPGv2
                                 case "Defend":
                                     for (int l = 0; l < f.Pop + warWith.Pop; l++)
                                     {
-                                        int num1 = HelperClasses.RandomNumber(0, warWith.Race.GetVals()[1] + (warWith.Race.GetVals()[2]/2) + warWith.Race.GetVals()[0]);
-                                        int num2 = HelperClasses.RandomNumber(0, f.Race.GetVals()[2] + (f.Race.GetVals()[1] / 2) + f.Race.GetVals()[0]);
+                                        num1 = HelperClasses.RandomNumber(0, warWith.Race.GetVals()[1] + (warWith.Race.GetVals()[2] / 2) + warWith.Race.GetVals()[0]);
+                                        num2 = HelperClasses.RandomNumber(0, f.Race.GetVals()[2] + (f.Race.GetVals()[1] / 2) + f.Race.GetVals()[0]);
                                         if (num1 >= num2)
                                             f.Pop--;
                                         else
@@ -265,7 +317,7 @@ namespace RPGv2
                                     break;
                                 case "End War":
                                     wars[k].OnGoing = false;
-                                    f.HistoricalEvents.Add(new HistoricalEvent(String.Format("At war with {0} for {1} years",wars[k].Side2,wars[k].Length), i));
+                                    f.HistoricalEvents.Add(new HistoricalEvent(string.Format("At war with {0} for {1} years", wars[k].Side2, wars[k].Length), i));
                                     break;
                                 default:
                                     Console.Clear();
@@ -282,7 +334,13 @@ namespace RPGv2
                     if (f.Pop <= 0)
                     {
                         factions.Remove(f);
-                        Console.WriteLine("{0} has fallen!", f.Name);
+                        if (disp)
+                        {
+                            Console.SetCursorPosition(0, 2);
+                            Console.Write("                                                                      ");
+                            Console.SetCursorPosition(0, 2);
+                            Console.Write("{0} has fallen!", f.Name);
+                        }
                     }
                 }
                 #endregion
