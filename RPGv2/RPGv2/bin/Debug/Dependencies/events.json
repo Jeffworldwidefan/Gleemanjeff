@@ -2,7 +2,7 @@
   {
     "Name": "None",
     "Desc": "Nothing happens",
-    "Chance": 60000,
+    "Chance": 90000,
     "Rate": 0
   },
   {
@@ -14,7 +14,7 @@
   {
     "Name": "Population Up",
     "Desc": "Population increases based on the amount of people in the faction",
-    "Chance": 20000,
+    "Chance": 2000,
     "Rate": -10
   },
   {

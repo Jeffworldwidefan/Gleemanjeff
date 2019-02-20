@@ -14,22 +14,48 @@ namespace RPGv2
             sw.Start();
             History h = StartHistory(yearInput);
             Console.Clear();
-            Console.WriteLine("Elapsed time: {0}", sw.Elapsed.Milliseconds/1000.0);
-            foreach (Faction f in h.Factions)
-                Console.WriteLine(f.ToString());
+            Console.WriteLine("Elapsed time: {0}", sw.Elapsed.Milliseconds / 1000.0);
+            
             bool done = false;
             while (!done)
             {
                 Console.Write(">");
                 string[] inp = Console.ReadLine().Split(' ');
+                string input = "";
+                for (int i = 1; i < inp.Length; i++)
+                {
+                    if (i != inp.Length - 1)
+                        input += inp[i] + " ";
+                    else
+                        input += inp[i];
+                }
+                Console.WriteLine(input);
                 switch (inp[0])
                 {
                     case "get":
                         foreach (Faction fac in h.Factions)
-                            if (fac.Name == inp[1])
+                            if (fac.Name == input)
                             {
                                 Console.WriteLine(fac.ToString());
                             }
+                        break;
+                    case "hist":
+                        foreach (Faction fac in h.Factions)
+                            if (fac.Name == input)
+                            {
+                                foreach (HistoricalEvent he in fac.HistoricalEvents.ToArray())
+                                    Console.WriteLine(he.ToString());
+                            }
+                        break;
+                    case "list":
+                        foreach (Faction f in h.Factions)
+                            Console.WriteLine(f.ToString());
+                        break;
+                    case "clear":
+                        Console.Clear();
+                        break;
+                    case "restart":
+                        StartGame();
                         break;
                     default:
                         done = true;
@@ -109,7 +135,7 @@ namespace RPGv2
             }
             int totalPeople = 0;
             double averagePopSeverity = 0;
-            
+
             for (int i = 0; i <= years; i++)
             {
                 if (disp)
@@ -324,6 +350,26 @@ namespace RPGv2
                                     Console.WriteLine("An unknown event has occured, name: {0}", we.Name);
                                     Console.ReadKey();
                                     break;
+                            }
+                        }
+                    }
+                }
+                if (i == years - 1)
+                {
+                    foreach (Faction fac in factions.ToArray())
+                    {
+
+                        List<War> wars = new List<War>(fac.Wars);
+                        if (wars.Count != 0)
+                        {
+                            foreach (War w in wars.ToArray())
+                            {
+                                if (!w.OnGoing)
+                                    wars.Remove(w);
+                            }
+                            foreach(War w in wars)
+                            {
+                                fac.HistoricalEvents.Add(new HistoricalEvent(String.Format("At war with {0} since {1}", w.Side2, w.StartYear), w.StartYear));
                             }
                         }
                     }

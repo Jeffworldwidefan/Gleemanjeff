@@ -419,6 +419,11 @@ namespace RPGv2
             Year = y;
         }
 
+        public override string ToString()
+        {
+            return String.Format("{0}\nYear: {1}", name, year);
+        }
+
         public string Name { get => name; set => name = value; }
         public int Year { get => year; set => year = value; }
     }
